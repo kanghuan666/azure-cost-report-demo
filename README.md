@@ -4,15 +4,42 @@ Azure Functions の Timer Trigger を使って、毎月初めに前月の Azure 
 
 ## アーキテクチャ
 
-[Timer Trigger 毎月1日 9:00 UTC]
-↓
-[Function App (Python 3.11, V2 model)]
-↓ Managed Identity 認証
-[Cost Management API] でコスト取得
-↓
-[pandas + openpyxl] で Excel 生成
-↓
-[Blob Storage] にアップロード
+```mermaid
+flowchart TB
+    Timer([⏰ Timer Trigger毎月1日 9:00 UTC])
+    
+    subgraph FunctionApp [Azure Function App]
+        direction TB
+        Logic[Python 3.11monthlyCostReport]
+    end
+    
+    subgraph Auth [認証]
+        MI[Managed Identity]
+    end
+    
+    subgraph DataSrc [データソース]
+        CostAPI[(Cost ManagementAPI)]
+    end
+    
+    subgraph Output [出力]
+        Excel[/Excel レポート/]
+        Blob[(Blob Storagereports container)]
+    end
+    
+    Timer -->|起動| Logic
+    Logic -->|認証| MI
+    MI -->|Cost Mgmt Reader| CostAPI
+    MI -->|Blob Data Contributor| Blob
+    CostAPI -->|JSON| Logic
+    Logic -->|pandas + openpyxl| Excel
+    Excel -->|アップロード| Blob
+    
+    style Timer fill:#e1f5ff,stroke:#0078d4
+    style Logic fill:#fff4e1,stroke:#ff8c00
+    style MI fill:#f0e1ff,stroke:#8b00ff
+    style CostAPI fill:#e1ffe1,stroke:#00a000
+    style Blob fill:#ffe1e1,stroke:#d00000
+```
 
 ## 使用技術
 
