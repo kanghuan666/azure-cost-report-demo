@@ -5,13 +5,22 @@ Azure Functions の Timer Trigger を使って、毎月初めに前月の Azure 
 ## アーキテクチャ
 
 [Timer Trigger 毎月1日 9:00 UTC]
+
 ↓
+
 [Function App (Python 3.11, V2 model)]
-↓ Managed Identity 認証
+
+↓ 
+
+Managed Identity 認証
 [Cost Management API] でコスト取得
+
 ↓
+
 [pandas + openpyxl] で Excel 生成
+
 ↓
+
 [Blob Storage] にアップロード
 
 ## 使用技術
